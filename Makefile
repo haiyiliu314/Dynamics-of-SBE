@@ -16,7 +16,7 @@ constants.o: constants.f90
 	${CMP} -c ${DEBUG}  $<
 
 clean:
-	rm -f *.mod *.o *~ *.exe *.x
+	rm -f *.mod *.o *~ *.exe *.x 
 
 core: run.x
 	ulimit -c unlimited; ./run.x	
