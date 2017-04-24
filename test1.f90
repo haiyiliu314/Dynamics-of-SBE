@@ -9,12 +9,14 @@ use constants
   double precision                                 ::t, k1, k2, k3, k4
   double precision                                 ::omegat1
   double precision                                 ::funcf
-  funcf(p) = aimag(omegat1*p)*2
+  funcf(p) = aimag(omegat*p)*2
   k1 = dt * funcf(g1)
   k2 = dt * funcf(g1+k1/2)
   k3 = dt * funcf(g1+k2/2)
   k4 = dt * funcf(g1+k3)
   runge_kuttaf = f1 + k1/6 +k2/3 + k3/3 + k4/6
+!write(*,*) 'funcf(g1)='
+!write(*,*) funcf(g1)
 !common omegat(1:10)
 !write(*,*) gamma
 end function runge_kuttaf
@@ -60,12 +62,13 @@ program main
   p(i+1,1) = runge_kuttap(p(i,1), i)
   f(i+1,1) = runge_kuttaf(f(i,1), p(i,1), i)
   end do
-  write(*,*) 'tgrid=' , tgrid
+!  write(*,*) 'tgrid=' , tgrid
   ptest = abs(p)**2;
   diff = abs(abs(p(tgrid+1,1)) - sqrt(0.1d0*((1d0-exp(-gamma*t_end)) / (gamma*1d-12))**2)) / sqrt(abs(0.1d0*((1d0-exp(-gamma*t_end)) / (gamma*1d-12))**2))
   write (*,*) 'p(1001) =' , p(1001,1)
   write(*,*) 'theory peak p', sqrt(0.1d0*((1d0-exp(-0.2d12*1d-12)) / (0.2d12*1d-12))**2)
   write(*,*) 'diff=', diff
+!------------------export data------------------
   write(list_file, '(A)') 'psquared.dat'
   open(unit=700,file=list_file)
 
@@ -74,6 +77,27 @@ program main
     write(700,*)   ptest(i, 1)
   END DO
   close(700)
+  write(list_file, '(A)') 'f.dat'
+  open(unit=701,file=list_file)
+
+  DO i = 1, tgrid+1
+
+    write(701,*)   f(i, 1)
+  END DO
+  close(701)
+  write(list_file, '(A)') 'dt.dat'
+  open(unit=702,file=list_file)
+
+    write(702,*)  dt
+
+  close(702)
+  write(list_file, '(A)') 'tgrid.dat'
+  open(unit=703,file=list_file)
+
+    write(703,*)  tgrid
+
+  close(703)
+!------------------export data------------------
 !  call system('matlab -r test04202017')
 !write(*,*) omegat
 end program main
