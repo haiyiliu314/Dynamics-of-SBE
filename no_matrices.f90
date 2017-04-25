@@ -47,58 +47,28 @@ program main
 !  double precision                               ::gamma = 0.2d12
   double precision, parameter                    ::f0 = 0d0, t_end = 1d-12, &
                                                    T = 0.1d-12 , tgrid = nint(t_end/dt)
-  double precision                               ::f(tgrid+1,1)
-  complex*16                                     ::p(tgrid+1,1), f6
+  double precision                               ::f
+  complex*16                                     ::p, f6
   double precision                               ::runge_kuttaf
 
-  double precision                               ::ptest(tgrid+1, 1), diff
+  double precision                               ::ptest, diff
   integer                                        ::i
   complex*16                                     ::runge_kuttap
   character(80)                                  :: list_file
 
-  p(1,1) = p0
-  f(1,1) = f0
-  do i = 1,tgrid+1
-  p(i+1,1) = runge_kuttap(p(i,1), i)
-  f(i+1,1) = runge_kuttaf(f(i,1), p(i,1), i)
+  p = p0
+  f = f0
+  do i = 1,tgrid
+  p = runge_kuttap(p, i)
+  f = runge_kuttaf(f, p, i)
   end do
 
 !  write(*,*) 'tgrid=' , tgrid
   ptest = abs(p)**2;
-!  diff = abs(abs(p(tgrid+1,1)) - sqrt(0.1d0*((1d0-exp(-gamma*t_end)) / (gamma*1d-12))**2)) / sqrt(abs(0.1d0*((1d0-exp(-gamma*t_end)) / (gamma*1d-12))**2))
-!  write (*,*) 'p(1001) =' , p(tgrid+1,1)
-!  write(*,*) 'theory peak p', sqrt(0.1d0*((1d0-exp(-0.2d12*1d-12)) / (0.2d12*1d-12))**2)
-!  write(*,*) 'diff=', diff
-!------------------export data------------------
-  write(list_file, '(A)') 'psquared.dat'
-  open(unit=700,file=list_file)
-
-  DO i = 1, tgrid+1
-
-    write(700,*)   ptest(i, 1)
-  END DO
-  close(700)
-  write(list_file, '(A)') 'f.dat'
-  open(unit=701,file=list_file)
-
-  DO i = 1, tgrid+1
-
-    write(701,*)   f(i, 1)
-  END DO
-  close(701)
-  write(list_file, '(A)') 'dt.dat'
-  open(unit=702,file=list_file)
-
-    write(702,*)  dt
-
-  close(702)
-  write(list_file, '(A)') 'tgrid.dat'
-  open(unit=703,file=list_file)
-
-    write(703,*)  tgrid
-
-  close(703)
-!------------------export data------------------
+  diff = abs(abs(p) - sqrt(0.1d0*((1d0-exp(-gamma*t_end)) / (gamma*1d-12))**2)) / sqrt(abs(0.1d0*((1d0-exp(-gamma*t_end)) / (gamma*1d-12))**2))
+  write (*,*) 'p(1001) =' , p
+  write(*,*) 'theory peak p', sqrt(0.1d0*((1d0-exp(-0.2d12*1d-12)) / (0.2d12*1d-12))**2)
+  write(*,*) 'diff=', diff
 !  call system('matlab -r test04202017')
 !write(*,*) omegat
 end program main
